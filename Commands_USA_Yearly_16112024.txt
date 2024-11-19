@@ -1,0 +1,243 @@
+**Yearly Database USA*** VEC Approach
+
+
+//General View
+
+describe
+sum y x1 x2 x2 x3 x4 x5 x6 x7 x8 x9
+reg y x1 x2 x3 x4 x5 x6 x7 x8 x9
+
+
+//Time Series setup
+
+tsset time
+
+//Unit Root Test - dfuller
+
+dfuller y
+dfuller x1
+dfuller x2
+dfuller x3
+dfuller x4
+dfuller x5
+dfuller x6
+dfuller x7
+dfuller x8
+dfuller x9
+
+*Comments: y, x3, x6, x9 are stationary
+
+//Augmented Dickey–Fuller test (ADF)
+
+dfuller y, trend
+dfuller x1, trend
+dfuller x2, trend
+dfuller x3, trend
+dfuller x4, trend
+dfuller x5, trend
+dfuller x6, trend
+dfuller x7, trend
+dfuller x8, trend
+dfuller x9, trend
+
+*Comments: y, x1, x3, x9 are stationary
+
+//Dfuller random walk with drift
+
+dfuller y, drift
+dfuller x1, drift
+dfuller x2, drift
+dfuller x3, drift
+dfuller x4, drift
+dfuller x5, drift
+dfuller x6, drift
+dfuller x7, drift
+dfuller x8, drift
+dfuller x9, drift
+
+*Comments: y, x1, x2, x3, x6, x8, x9 are stationary
+
+//dfuller with lags 
+
+dfuller y, drift lags(3) regress
+dfuller x1, drift lags(3) regress
+dfuller x2, drift lags(3) regress
+dfuller x3, drift lags(3) regress
+dfuller x4, drift lags(3) regress
+dfuller x5, drift lags(3) regress
+dfuller x6, drift lags(3) regress
+dfuller x7, drift lags(3) regress
+dfuller x8, drift lags(3) regress
+dfuller x9, drift lags(3) regress
+
+*Comments: y, x2, x3, x4, x5, x6, x8, x9 are stationary
+
+//Unit Root Test - Phillips–Perron
+
+pperron y
+pperron x1
+pperron x2
+pperron x3
+pperron x4
+pperron x5
+pperron x6
+pperron x7
+pperron x8
+pperron x9
+
+*Comments: y, x2, x3, x6, x9 are stationary
+
+//Augmented Phillips–Perron 
+
+pperron y, trend
+pperron x1, trend
+pperron x2, trend
+pperron x3, trend
+pperron x4, trend
+pperron x5, trend
+pperron x6, trend
+pperron x7, trend
+pperron x8, trend
+pperron x9, trend
+
+*Comments:  y, x1, x2, x3 are stationary
+
+//Phillips–Perron 10 lags non constant
+
+pperron y, lags(10) noconstant
+pperron x1, lags(10) noconstant
+pperron x2, lags(10) noconstant
+pperron x3, lags(10) noconstant
+pperron x4, lags(10) noconstant
+pperron x5, lags(10) noconstant
+pperron x6, lags(10) noconstant
+pperron x7, lags(10) noconstant
+pperron x8, lags(10) noconstant
+pperron x9, lags(10) noconstant
+
+*Comments: all non stationary
+
+//Portmanteau (Q) test for white noise
+
+wntestq y
+wntestq x1
+wntestq x2
+wntestq x3
+wntestq x4
+wntestq x5
+wntestq x6
+wntestq x7
+wntestq x8
+wntestq x9
+
+*Comments: Autocorrelation for x1, x2, x4, x5, x6, x7, x8, x9
+
+//Portmanteau (Q) test for white noise with 10 autocorrelations
+
+wntestq y, lags(10)
+wntestq x1, lags(10)
+wntestq x2, lags(10)
+wntestq x3, lags(10)
+wntestq x4, lags(10)
+wntestq x5, lags(10)
+wntestq x6, lags(10)
+wntestq x7, lags(10)
+wntestq x8, lags(10)
+wntestq x9, lags(10)
+
+*Comments: Autocorrelation for x1, x2, x3, x4, x5, x6, x7, x8, x9
+
+//VIF (Variance Inflation Factor)
+
+regress y x1 x2 x3 x4 x5 x6 x7 x8 x9
+vif
+
+*Comments: High Values x4, x6. Mean 4.14
+
+//Correlation Matrix 
+
+pwcorr y x1 x2 x3 x4 x5 x6 x7 x8 x9, sig
+
+*Comments: No high values
+
+//Skewness and kurtosis tests for normality
+
+sktest y x1 x2 x3 x4 x5 x6 x7 x8 x9
+
+*Comments: Non-Normal y, x1
+
+//VEC MODEL
+
+//Lag-order selection criteria
+
+varsoc y x1 x2 x3 x4 x5 x6 x7 x8 x9
+
+*Comments: AIC, HQIC, SBIC - 3 Lags 
+
+
+//Vector error-correction model
+
+vec y x1 x2 x3 x4 x5 x6 x7 x8 x9
+*Comments: Cointegration - Long term effects between y, x2, x3, x4, x5, x6, x7
+Short term effects between: y, x1, x3, x4, x6, x7, x8
+
+//Use 3 lags for the underlying vector autoregressive (VEC) model
+
+vec y x1 x2 x3 x4 x5 x6 x7 x8 x9, lag(3)
+
+*Comments: Cointegration - Long term effects: none
+Short term effects between: y, x3, x6
+
+//Use 2 cointegrating equations
+
+vec y x1 x2 x3 x4 x5 x6 x7 x8 x9, lags(3) rank(2)
+
+*Comments: Cointegration - Long term effects (1st equation): between y, x8. Long term effects (2nd equation): y, x2, x5, x6 
+Short term effects between: y, x1, x6, x7 
+
+//Add a linear trend in the cointegrating equations and a quadratic trend in the undifferenced data
+
+vec y x1 x2 x3 x4 x5 x6 x7 x8 x9, lags(3) rank(2) trend(trend)
+
+*Comments: Cointegration - Long term effects (1st equation): y x2, x3, x5. Long term effects (2nd equation): None  
+Short term effects between: y, x1, x6, x7
+
+//Same as above, but without a trend or a constant
+
+vec y x1 x2 x3 x4 x5 x6 x7 x8 x9, lags(3) rank(2) trend(none)
+
+*Comments: Cointegration - Long term effects (1st equation): y x2, x3, x6. Long term effects (2nd equation): None  
+Short term effects between: y, x6, x8
+
+//Same as above, but I included a constant
+
+vec y x1 x2 x3 x4 x5 x6 x7 x8 x9, lags(3) rank(2) trend(constant)
+
+*Comments: Cointegration - Long term effects (1st equation): y, x8. Long term effects (2nd equation): y, x2, x5, x6
+Short term effects between: y, x1, x6, x7
+
+
+//VEC residuals and wntestq — Portmanteau (Q) test for white noise
+
+predict vec_residuals, resid
+wntestq vec_residuals, lags(10)
+
+*Comments: no correlation inside residuals
+
+//Check eigenvalue stability condition after vec
+
+vecstable
+
+*Comments: The VECM specification imposes 9 unit moduli
+VEC with 3 lags: 9
+VEC with trend: 8
+VEC with trend (none): 8
+VEC with trend (constant):9
+
+//Lagrange multiplier (LM) test
+
+veclmar 
+
+*Comments: Error
+
+
